@@ -1,0 +1,7 @@
+#+title: Todo
+
+* Задачи
+** .devcontainer/down
+Сделать команду остановки и удаления контейнеров
+** Подключать vscode features
+https://github.com/devcontainers/features

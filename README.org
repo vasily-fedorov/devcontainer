@@ -1,0 +1,64 @@
+#+title: Readme
+
+Контейнеризация разработки на стандартных инструментах в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
+
+Получаем:
+1. Работа на стандартных инстурментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
+2. Запускается одной кнопкой в vscode
+3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore и т.д.
+
+* Использование
+** Инициализация devcontainer
+#+begin_src shell
+git clone https://github.com/vasily-fedorov/devcontainer
+cd project
+../devcontainer/init <project_name>
+#+end_src
+
+** Использование devcontainer
+В корне проекта:
+#+begin_src shell
+.devcontainer activate
+#+end_src
+И попадаем в `bash` внутри контейнера.
+Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в /workspace .
+
+** Доступные команды
+Доступные после инициализации команды повторяют devcontainer/cli .
+- .devcontainer/up :: сборка и запуск контейнеров
+- .devcontainer/build :: сборка контейнеров
+- .devcontainer/activate :: сборка, запуск и логин в bash внутри основного контейнера
+- .devcontainer/exec :: запуск команды внутри контейнера. Например,  `/devcontainer/exec bash` запускает в shell внутри контейнера.
+- .devcontainer/stop :: останавливает контейнеры (еще [[https://github.com/devcontainers/cli?tab=readme-ov-file][не реализовано]] в cli )
+
+** Подключение сервисов
+В файле .devcontainer/compose есть директивы include. Чтобы включить сервис в проекте нужно раскомментировать соответсвующую строчку.
+#+begin_src
+include/<service>.yaml
+#+end_src
+Данные окажутся в .devcontainer/data/<service>
+Логи окажутся в .devcontainer/logs/<service>
+
+*** Пример
+#+begin_src yaml
+include:
+  - services/postgresql.yaml
+#+end_src
+Данные:
+Логи:
+** Данные, кэш и bash_history
+Все данные и логи по умолчанию внутри ./.devcontainer
+- .devcontainer/bash_history :: история bash внутри контейнера
+- .devcontainer/data :: данные подключенных сервисов
+- .devcontainer/cache :: /home/$USER/.cache
+
+* Пример использования
+#+begin_src
+git clone https://github.com/django-ve/django-helloworld
+git clone https://github.com/vasily-fedorov/devcontainer
+cd django-helloworld
+../devcontainer/init helloworld
+.devcontainer activate
+python manage.py runserver 0.0.0.0:8000
+#+end_src
+И идем на http://localhost:8000, видим надпись "Hello world"

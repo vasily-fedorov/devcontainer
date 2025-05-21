@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+. .devcontainer/.env
+docker exec -it $COMPOSE_PROJECT_NAME $*
