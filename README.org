@@ -66,6 +66,7 @@ git clone https://github.com/vasily-fedorov/devcontainer
 cd django-helloworld
 ../devcontainer/init helloworld
 .devcontainer activate
+pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8000
 #+end_src
 И идем на http://localhost:8000, видим надпись "Hello world"
