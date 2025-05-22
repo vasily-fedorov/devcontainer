@@ -3,4 +3,5 @@ echo "The script you are running has:"
 echo "basename: [$(basename "$0")]"
 echo "dirname : [$(dirname "$0")]"
 echo "pwd     : [$(pwd)]"
-cp -r $(dirname "$0")/devcontainer $(pwd)/.devcontainer
+cp -r --remove-destination $(dirname "$0")/devcontainer $(pwd)/.devcontainer
+echo COMPOSE_PROJECT_NAME=$1 >> $(pwd)/.devcontainer/.env

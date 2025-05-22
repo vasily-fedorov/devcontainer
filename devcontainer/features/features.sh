@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
-bash python/install.sh
-bash yandexcloud-cli/install.sh
-bash terraform/install.sh
+bash ~/devcontainer/features/python/install.sh
+#bash ~/devcontainer/features/yandexcloud-cli/install.sh
+#bash ~/devcontainer/features/terraform/install.sh
+#echo ". ~/devcontainer/features/env.sh" >> ~/.bashrc

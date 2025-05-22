@@ -3,9 +3,10 @@
 Контейнеризация разработки на стандартных инструментах в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
 
 Получаем:
-1. Работа на стандартных инстурментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
+1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
 2. Запускается одной кнопкой в vscode
 3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore и т.д.
+4. Можно отлаживать создание devcontainer
 
 * Использование
 ** Инициализация devcontainer
@@ -18,17 +19,17 @@ cd project
 ** Использование devcontainer
 В корне проекта:
 #+begin_src shell
-.devcontainer activate
+.devcontainer/activate
 #+end_src
-И попадаем в `bash` внутри контейнера.
-Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в /workspace .
+И попадаем в =bash= внутри контейнера.
+Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в =/workspace=.
 
 ** Доступные команды
 Доступные после инициализации команды повторяют devcontainer/cli .
 - .devcontainer/up :: сборка и запуск контейнеров
 - .devcontainer/build :: сборка контейнеров
 - .devcontainer/activate :: сборка, запуск и логин в bash внутри основного контейнера
-- .devcontainer/exec :: запуск команды внутри контейнера. Например,  `/devcontainer/exec bash` запускает в shell внутри контейнера.
+- .devcontainer/exec :: запуск команды внутри контейнера. Например,  =/devcontainer/exec bash= запускает в shell внутри контейнера.
 - .devcontainer/stop :: останавливает контейнеры (еще [[https://github.com/devcontainers/cli?tab=readme-ov-file][не реализовано]] в cli )
 
 ** Подключение сервисов
@@ -47,11 +48,17 @@ include:
 Данные:
 Логи:
 ** Данные, кэш и bash_history
-Все данные и логи по умолчанию внутри ./.devcontainer
+Все данные по умолчанию внутри ./.devcontainer
 - .devcontainer/bash_history :: история bash внутри контейнера
 - .devcontainer/data :: данные подключенных сервисов
-- .devcontainer/cache :: /home/$USER/.cache
+- .devcontainer/cache :: ~/.cache
 
+* Что сделано
+** Кэширование apt и pip
+При сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
+** Ведение истории bash
+** Правильные gitignore и dockerignore
+**
 * Пример использования
 #+begin_src
 git clone https://github.com/django-ve/django-helloworld
