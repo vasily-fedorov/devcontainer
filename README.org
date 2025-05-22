@@ -45,8 +45,7 @@ include/<service>.yaml
 include:
   - services/postgresql.yaml
 #+end_src
-Данные:
-Логи:
+
 ** Данные, кэш и bash_history
 Все данные по умолчанию внутри ./.devcontainer
 - .devcontainer/bash_history :: история bash внутри контейнера
@@ -58,7 +57,7 @@ include:
 При сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
 ** Ведение истории bash
 ** Правильные gitignore и dockerignore
-**
+
 * Пример использования
 #+begin_src
 git clone https://github.com/django-ve/django-helloworld
