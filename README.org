@@ -65,7 +65,7 @@ git clone https://github.com/django-ve/django-helloworld
 git clone https://github.com/vasily-fedorov/devcontainer
 cd django-helloworld
 ../devcontainer/init helloworld
-.devcontainer activate
+.devcontainer/activate
 pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8000
 #+end_src
