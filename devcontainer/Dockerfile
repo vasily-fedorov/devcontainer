@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME sudo
 RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER_NAME
 USER $USER_NAME
-RUN sudo chmod a+rwx /home/$USER_NAME/.cache
+
 COPY .devcontainer /home/$USER_NAME/devcontainer
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
