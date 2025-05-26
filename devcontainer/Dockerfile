@@ -20,16 +20,12 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean ; echo 'Binary::apt::APT::Keep-Downlo
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && apt -y install --no-install-recommends --no-install-suggests \
-    adduser sudo curl bash less
-#    python3 bash python3-venv python3-pip gcc \
-#    build-essential libssl-dev zlib1g-dev \
-#    libbz2-dev libreadline-dev libsqlite3-dev curl git \
-#    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+    adduser sudo curl bash less ca-certificates ssh-client
 
 RUN adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME sudo
 RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER_NAME
 USER $USER_NAME
-
+RUN sudo chmod a+rwx /home/$USER_NAME/.cache
 COPY .devcontainer /home/$USER_NAME/devcontainer
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \

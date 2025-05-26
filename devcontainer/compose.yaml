@@ -7,6 +7,7 @@ services:
       - ../:/workspace
       - ./bash_history:/home/$COMPOSE_PROJECT_NAME/.bash_history
       - ./cache:/home/$COMPOSE_PROJECT_NAME/.cache
+      - /var/run/docker.sock:/var/run/docker.sock
     build:
       context: ../
       dockerfile: ./.devcontainer/Dockerfile
