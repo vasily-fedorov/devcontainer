@@ -15,5 +15,5 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
 sudo apt -y install  --no-install-recommends --no-install-suggests \
-    docker-ce-cli
+  docker-ce-cli docker-compose-plugin
 sudo chmod a+rw /var/run/docker.sock # mount point
