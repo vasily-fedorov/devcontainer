@@ -7,7 +7,12 @@ sudo apt -y install  --no-install-recommends --no-install-suggests \
 make build-essential libssl-dev zlib1g-dev \
 libbz2-dev libreadline-dev libsqlite3-dev curl git \
 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-gcc ca-certificates
+gcc ca-certificates python3-pip
+
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONUNBUFFERED=1
+# https://docs.python.org/3/library/asyncio-dev.html#debug-mode
+export PYTHONASYNCIODEBUG=1
 
 curl https://pyenv.run | bash
 
@@ -22,5 +27,6 @@ echo 'eval "$(pyenv init - bash)"' >> ~/.profile
 CC=gcc pyenv install $PYTHON_VERSION
 pyenv global $PYTHON_VERSION
 pyenv rehash
+cd /workspace
 pyenv virtualenv $PYTHON_VERSION workspace
 pip install setuptools

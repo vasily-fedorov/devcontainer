@@ -1,0 +1,10 @@
+services:
+  elasticmq:
+    container_name: elascicmq
+    image: softwaremill/elasticmq-native:latest
+#    environment:
+#      MINIO_ROOT_USER: admin
+#      MINIO_ROOT_PASSWORD: admin
+    ports:
+      - 9324:9324
+      - 9325:9325
