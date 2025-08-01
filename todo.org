@@ -7,6 +7,16 @@
 https://github.com/devcontainers/features
 ** Разобраться с пользователями и rootless запуском
 В wsl2 UID=1002, в обычном Linux UID=1000 . Надо ли создавать пользователя, или запускать от рута в контейнере? И если от рута - как мапить правки обратно с правильными правами?
+https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
 ** Улучшить подключение features
 Подключать конкретные features
 Добавлять в проект
+** Команду убирания ненужного (неиспользуемого)
+** Переменные окружения
+shell в Dockerfile не подхватывает из .bashrc - на примере pyenv
+** ssh-client добавил
+** DONE dind добавить
+** DONE копировать только features, а не весь .devcontainer
+чтоб кэширование нормально работало
+** сделать features вместе с compose
+Чтоб в командах подключались compose-файлы features, тогда работает merge
