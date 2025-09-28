@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
-docker compose -f ./.devcontainer/compose.yaml up -d --build --remove-orphans
-. .devcontainer/.env
+docker compose -f ./.devcontainer/compose.yaml up -d --build --remove-orphans && \
+export $(cat .devcontainer/.env) && \
 docker exec -it $COMPOSE_PROJECT_NAME bash

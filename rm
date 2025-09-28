@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+
+# Check if feature name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 -f <feature>"
+    exit 1
+fi
+
+# Parse command line arguments
+while getopts "f:" opt; do
+    case $opt in
+        f)
+            FEATURE=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$FEATURE" ]; then
+    echo "Feature name is required. Usage: $0 -f <feature>"
+    exit 1
+fi
+
+# Check if feature directory exists in devcontainer
+if [ ! -d ".devcontainer/features/$FEATURE" ]; then
+    echo "Feature '$FEATURE' not found in .devcontainer/features directory"
+    exit 1
+fi
+
+# Remove feature from devcontainer/features
+echo "Removing feature: $FEATURE"
+rm -rf ".devcontainer/features/$FEATURE"
+
+# Remove install.sh call from features.sh
+echo "Removing feature installation from features.sh"
+if [ -f ".devcontainer/features/features.sh" ]; then
+    # Create temporary file without the feature's install line
+    grep -v "bash /workspace/.devcontainer/features/$FEATURE/install.sh" ".devcontainer/features/features.sh" > ".devcontainer/features/features.sh.tmp"
+    mv ".devcontainer/features/features.sh.tmp" ".devcontainer/features/features.sh"
+fi
+
+echo "Feature '$FEATURE' removed successfully"

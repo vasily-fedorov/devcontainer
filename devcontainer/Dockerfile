@@ -22,12 +22,13 @@ RUN adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME 
 RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER_NAME
 
 USER $USER_NAME
-COPY --chown=$USER_ID .devcontainer/features /home/$USER_NAME/devcontainer/features
+COPY --chown=$USER_ID .devcontainer /workspace/.devcontainer
+#COPY --chown=$USER_ID .devcontainer/features.sh /home/$USER_NAME/devcontainer/features.sh
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     --mount=type=cache,target=/root/.cache,sharing=locked \
     --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \
-    sh /home/$USER_NAME/devcontainer/features/features.sh
+    if [ -e /workspace/.devcontainer/features/features.sh ]; then sh /workspace/.devcontainer/features/features.sh; fi
 
 WORKDIR /workspace
 CMD sh /workspace/.devcontainer/cmd.sh & sleep infinity
