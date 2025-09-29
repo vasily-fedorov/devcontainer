@@ -2,4 +2,4 @@ services:
   devcontainer:
     container_name: $COMPOSE_PROJECT_NAME
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:rw

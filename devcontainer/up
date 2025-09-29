@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 docker compose -f ./.devcontainer/compose.yaml \
-#    -f ./.devcontainer/features/<feature>/compose.yaml \
-    up -d --remove-orphans
+    up -d --build --remove-orphans

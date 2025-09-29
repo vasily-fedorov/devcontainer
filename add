@@ -37,21 +37,40 @@ fi
 # Copy feature to devcontainer/features
 echo "Adding feature: $FEATURE"
 mkdir -p ".devcontainer/features"
-if [ -e .devcontainer/features/features.sh ]; then echo "features.sh found"; else cp "$(dirname "$0")/features/features.sh" ".devcontainer/features/features.sh"; fi;
 cp -r "$(dirname "$0")/features/$FEATURE" ".devcontainer/features/$FEATURE"
 
-# Add install.sh call to features.sh
-echo "Adding feature installation to features.sh"
-echo "bash /workspace/.devcontainer/features/$FEATURE/install.sh" >> ".devcontainer/features/features.sh"
-
-# Update activate script to include feature's compose.yaml if it exists
-if [ -f ".devcontainer/features/$FEATURE/compose.yaml" ]; then
-    echo "Adding feature compose.yaml to activate script"
-    # Create a backup of the original activate script
-    cp ".devcontainer/activate" ".devcontainer/activate.backup"
+# Update Dockerfile to include feature's install.sh
+echo "Adding feature installation to Dockerfile"
+if [ -f ".devcontainer/Dockerfile" ]; then
+    # Create a backup of the original Dockerfile
+    cp ".devcontainer/Dockerfile" ".devcontainer/Dockerfile.backup"
     
-    # Create a new activate script that includes the feature's compose.yaml
-    cat > ".devcontainer/activate" << 'EOF'
+    # Find the line with "# features begin" and insert the feature install command after it
+    awk '
+    /# features begin: run install.sh for every feature/ {
+        print $0
+        print "RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \\"
+        print "    --mount=type=cache,target=/var/lib/apt,sharing=locked \\"
+        print "    --mount=type=cache,target=/root/.cache,sharing=locked \\"
+        print "    --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \\"
+        print "    if [ -f /workspace/.devcontainer/features/'$FEATURE'/install.sh ]; then bash /workspace/.devcontainer/features/'$FEATURE'/install.sh; fi"
+        next
+    }
+    { print $0 }
+    ' ".devcontainer/Dockerfile.backup" > ".devcontainer/Dockerfile"
+    
+    # Remove the backup
+    rm ".devcontainer/Dockerfile.backup"
+fi
+
+# Update up script to include feature's compose.yaml if it exists
+if [ -f ".devcontainer/features/$FEATURE/compose.yaml" ]; then
+    echo "Adding feature compose.yaml to up script"
+    # Create a backup of the original up script
+    cp ".devcontainer/up" ".devcontainer/up.backup"
+    
+    # Create a new up script that includes the feature's compose.yaml
+    cat > ".devcontainer/up" << 'EOF'
 #!/usr/bin/env sh
 docker compose -f ./.devcontainer/compose.yaml \
 EOF
@@ -60,19 +79,17 @@ EOF
     for feature_dir in .devcontainer/features/*/; do
         if [ -f "${feature_dir}compose.yaml" ]; then
             feature_name=$(basename "$feature_dir")
-            echo "    -f ./.devcontainer/features/${feature_name}/compose.yaml \\" >> ".devcontainer/activate"
+            echo "    -f ./.devcontainer/features/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
         fi
     done
     
-    # Add the rest of the original activate script
-    cat >> ".devcontainer/activate" << 'EOF'
-    up -d --build --remove-orphans && \
-export $(cat .devcontainer/.env) && \
-docker exec -it $COMPOSE_PROJECT_NAME bash
+    # Add the rest of the original up script
+    cat >> ".devcontainer/up" << 'EOF'
+    up -d --remove-orphans
 EOF
     
     # Remove the backup
-    rm ".devcontainer/activate.backup"
+    rm ".devcontainer/up.backup"
 fi
 
 echo "Feature '$FEATURE' added successfully"

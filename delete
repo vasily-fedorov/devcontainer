@@ -1,0 +1,111 @@
+#!/usr/bin/env sh
+
+# Check if feature name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 -f <feature>"
+    exit 1
+fi
+
+# Parse command line arguments
+while getopts "f:" opt; do
+    case $opt in
+        f)
+            FEATURE=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$FEATURE" ]; then
+    echo "Feature name is required. Usage: $0 -f <feature>"
+    exit 1
+fi
+
+# Check if feature directory exists in devcontainer
+if [ ! -d ".devcontainer/features/$FEATURE" ]; then
+    echo "Feature '$FEATURE' not found in .devcontainer/features directory"
+    exit 1
+fi
+
+# Remove feature from devcontainer/features
+echo "Removing feature: $FEATURE"
+rm -rf ".devcontainer/features/$FEATURE"
+
+# Remove install.sh call from Dockerfile
+echo "Removing feature installation from Dockerfile"
+if [ -f ".devcontainer/Dockerfile" ]; then
+#    # Use a simpler and more reliable approach
+#    grep -v "if \[ -f /workspace/.devcontainer/features/$FEATURE/install.sh \]; then bash /workspace/.devcontainer/features/$FEATURE/install.sh; fi" ".devcontainer/Dockerfile" > ".devcontainer/Dockerfile.tmp"
+    
+    # Now remove the 4 cache mount lines that precede the install.sh line
+    awk -v feature="$FEATURE" '
+    BEGIN { skip_next = 0 }
+    /RUN --mount=type=cache,target=\/var\/cache\/apt,sharing=locked \\/ {
+        # Check if this line is followed by our feature install line
+        # We will check the next 3 lines and the install line
+        line1 = $0
+        getline line2
+        getline line3
+        getline line4
+        getline line5
+        
+        # Check if line5 contains our feature install
+        if (line5 ~ "if \\[ -f /workspace/.devcontainer/features/" feature "/install.sh \\]; then bash /workspace/.devcontainer/features/" feature "/install.sh; fi") {
+            # Skip all 5 lines
+            next
+        } else {
+            # Print all 5 lines
+            print line1
+            print line2
+            print line3
+            print line4
+            print line5
+        }
+        next
+    }
+    { print $0 }
+    ' ".devcontainer/Dockerfile" > ".devcontainer/Dockerfile.tmp"
+    
+    mv ".devcontainer/Dockerfile.tmp" ".devcontainer/Dockerfile"
+    rm -f ".devcontainer/Dockerfile.tmp"
+fi
+
+# Update up script to remove feature's compose.yaml if it exists
+if [ -f ".devcontainer/up" ]; then
+    echo "Removing feature compose.yaml from up script"
+    # Create a backup of the original up script
+    cp ".devcontainer/up" ".devcontainer/up.backup"
+    
+    # Create a new up script without the removed feature's compose.yaml
+    cat > ".devcontainer/up" << 'EOF'
+#!/usr/bin/env sh
+docker compose -f ./.devcontainer/compose.yaml \
+EOF
+    
+    # Add all remaining feature compose.yaml files
+    for feature_dir in .devcontainer/features/*/; do
+        if [ -f "${feature_dir}compose.yaml" ]; then
+            feature_name=$(basename "$feature_dir")
+            if [ "$feature_name" != "$FEATURE" ]; then
+                echo "    -f ./.devcontainer/features/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
+            fi
+        fi
+    done
+    
+    # Add the rest of the original up script
+    cat >> ".devcontainer/up" << 'EOF'
+    up -d --remove-orphans
+EOF
+    
+    # Remove the backup
+    rm ".devcontainer/up.backup"
+fi
+
+echo "Feature '$FEATURE' removed successfully"

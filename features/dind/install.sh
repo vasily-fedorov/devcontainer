@@ -16,7 +16,9 @@ echo \
 sudo apt update
 sudo apt -y install  --no-install-recommends --no-install-suggests \
   docker-ce-cli docker-compose-plugin
-sudo chmod a+rw /var/run/docker.sock # mount point
+if [ -e /var/run/docker.sock ];
+then sudo chmod a+rw /var/run/docker.sock;
+     fi;# mount point
 
 # sudo apt-get update
 # sudo apt-get -y install apt-transport-https \

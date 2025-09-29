@@ -23,12 +23,9 @@ RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$
 
 USER $USER_NAME
 COPY --chown=$USER_ID .devcontainer /workspace/.devcontainer
-#COPY --chown=$USER_ID .devcontainer/features.sh /home/$USER_NAME/devcontainer/features.sh
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    --mount=type=cache,target=/root/.cache,sharing=locked \
-    --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \
-    if [ -e /workspace/.devcontainer/features/features.sh ]; then sh /workspace/.devcontainer/features/features.sh; fi
+
+# features begin: run install.sh for every feature
+# features end
 
 WORKDIR /workspace
 CMD sh /workspace/.devcontainer/cmd.sh & sleep infinity
