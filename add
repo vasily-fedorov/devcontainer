@@ -45,15 +45,15 @@ if [ -f ".devcontainer/Dockerfile" ]; then
     # Create a backup of the original Dockerfile
     cp ".devcontainer/Dockerfile" ".devcontainer/Dockerfile.backup"
     
-    # Find the line with "# features begin" and insert the feature install command after it
+    # Find the line with "# features end" and insert the feature install command before it
     awk '
-    /# features begin: run install.sh for every feature/ {
-        print $0
+    /# features end/ {
         print "RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \\"
         print "    --mount=type=cache,target=/var/lib/apt,sharing=locked \\"
         print "    --mount=type=cache,target=/root/.cache,sharing=locked \\"
         print "    --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \\"
         print "    if [ -f /workspace/.devcontainer/features/'$FEATURE'/install.sh ]; then bash /workspace/.devcontainer/features/'$FEATURE'/install.sh; fi"
+        print $0
         next
     }
     { print $0 }
