@@ -28,4 +28,4 @@ COPY --chown=$USER_ID .devcontainer /workspace/.devcontainer
 # features end
 
 WORKDIR /workspace
-CMD sh /workspace/.devcontainer/cmd.sh & sleep infinity
+CMD sh /workspace/.devcontainer/cmd.sh && sleep infinity
