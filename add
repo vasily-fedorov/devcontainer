@@ -85,7 +85,7 @@ EOF
     
     # Add the rest of the original up script
     cat >> ".devcontainer/up" << 'EOF'
-    up -d --remove-orphans
+    up -d --build --remove-orphans
 EOF
     
     # Remove the backup

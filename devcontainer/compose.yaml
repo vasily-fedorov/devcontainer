@@ -21,9 +21,3 @@ services:
     tty: true
     ports:
       - $PORT:$PORT
-#include:
-#  - services/redis.yaml
-#  - services/minio.yaml
-#  - services/postgres.yaml
-#  - services/elasticmq.yaml
-# ...other services
