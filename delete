@@ -29,22 +29,19 @@ if [ -z "$FEATURE" ]; then
 fi
 
 # Check if feature directory exists in devcontainer
-if [ ! -d ".devcontainer/features/$FEATURE" ]; then
-    echo "Feature '$FEATURE' not found in .devcontainer/features directory"
+if [ ! -d ".devcontainer/$FEATURE" ]; then
+    echo "Feature '$FEATURE' not found in .devcontainer directory"
     exit 1
 fi
 
-# Remove feature from devcontainer/features
+# Remove feature from devcontainer
 echo "Removing feature: $FEATURE"
-rm -rf ".devcontainer/features/$FEATURE"
+rm -rf ".devcontainer/$FEATURE"
 
 # Remove install.sh call from Dockerfile
 echo "Removing feature installation from Dockerfile"
 if [ -f ".devcontainer/Dockerfile" ]; then
-#    # Use a simpler and more reliable approach
-#    grep -v "if \[ -f /workspace/.devcontainer/features/$FEATURE/install.sh \]; then bash /workspace/.devcontainer/features/$FEATURE/install.sh; fi" ".devcontainer/Dockerfile" > ".devcontainer/Dockerfile.tmp"
-    
-    # Now remove the 4 cache mount lines that precede the install.sh line
+    # Remove the 5 lines related to this feature installation
     awk -v feature="$FEATURE" '
     BEGIN { skip_next = 0 }
     /RUN --mount=type=cache,target=\/var\/cache\/apt,sharing=locked \\/ {
@@ -57,7 +54,7 @@ if [ -f ".devcontainer/Dockerfile" ]; then
         getline line5
         
         # Check if line5 contains our feature install
-        if (line5 ~ "if \\[ -f /workspace/.devcontainer/features/" feature "/install.sh \\]; then bash /workspace/.devcontainer/features/" feature "/install.sh; fi") {
+        if (line5 ~ "if \\[ -f /workspace/.devcontainer/" feature "/install.sh \\]; then bash /workspace/.devcontainer/" feature "/install.sh; fi") {
             # Skip all 5 lines
             next
         } else {
@@ -90,11 +87,11 @@ docker compose -f ./.devcontainer/compose.yaml \
 EOF
     
     # Add all remaining feature compose.yaml files
-    for feature_dir in .devcontainer/features/*/; do
+    for feature_dir in .devcontainer/*/; do
         if [ -f "${feature_dir}compose.yaml" ]; then
             feature_name=$(basename "$feature_dir")
             if [ "$feature_name" != "$FEATURE" ]; then
-                echo "    -f ./.devcontainer/features/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
+                echo "    -f ./.devcontainer/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
             fi
         fi
     done

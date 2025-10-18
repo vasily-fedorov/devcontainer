@@ -34,10 +34,9 @@ if [ ! -d "$(dirname "$0")/features/$FEATURE" ]; then
     exit 1
 fi
 
-# Copy feature to devcontainer/features
+# Copy feature directly to .devcontainer
 echo "Adding feature: $FEATURE"
-mkdir -p ".devcontainer/features"
-cp -r "$(dirname "$0")/features/$FEATURE" ".devcontainer/features/$FEATURE"
+cp -r "$(dirname "$0")/features/$FEATURE" ".devcontainer/$FEATURE"
 
 # Update Dockerfile to include feature's install.sh
 echo "Adding feature installation to Dockerfile"
@@ -52,7 +51,7 @@ if [ -f ".devcontainer/Dockerfile" ]; then
         print "    --mount=type=cache,target=/var/lib/apt,sharing=locked \\"
         print "    --mount=type=cache,target=/root/.cache,sharing=locked \\"
         print "    --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \\"
-        print "    if [ -f /workspace/.devcontainer/features/'$FEATURE'/install.sh ]; then bash /workspace/.devcontainer/features/'$FEATURE'/install.sh; fi"
+        print "    if [ -f /workspace/.devcontainer/'$FEATURE'/install.sh ]; then bash /workspace/.devcontainer/'$FEATURE'/install.sh; fi"
         print $0
         next
     }
@@ -64,7 +63,7 @@ if [ -f ".devcontainer/Dockerfile" ]; then
 fi
 
 # Update up script to include feature's compose.yaml if it exists
-if [ -f ".devcontainer/features/$FEATURE/compose.yaml" ]; then
+if [ -f ".devcontainer/$FEATURE/compose.yaml" ]; then
     echo "Adding feature compose.yaml to up script"
     # Create a backup of the original up script
     cp ".devcontainer/up" ".devcontainer/up.backup"
@@ -76,10 +75,10 @@ docker compose -f ./.devcontainer/compose.yaml \
 EOF
     
     # Add all feature compose.yaml files
-    for feature_dir in .devcontainer/features/*/; do
+    for feature_dir in .devcontainer/*/; do
         if [ -f "${feature_dir}compose.yaml" ]; then
             feature_name=$(basename "$feature_dir")
-            echo "    -f ./.devcontainer/features/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
+            echo "    -f ./.devcontainer/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
         fi
     done
     
