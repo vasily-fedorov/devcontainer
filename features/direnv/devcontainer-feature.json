@@ -1,0 +1,12 @@
+{
+    "name": "Direnv",
+    "id": "direnv",
+    "version": "1.0.0",
+    "description": "Installs direnv for environment variable management per directory",
+    "documentationURL": "https://direnv.net/",
+    "options": {},
+    "installsAfter": [],
+    "containerEnv": {
+        "DIRENV_CONFIG": "/home/user/.config/direnv"
+    }
+}

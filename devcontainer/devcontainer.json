@@ -5,4 +5,5 @@
     "containerUser": "user",
     "workspaceFolder": "/workspace",
     "workspaceMount": "source=../,target=/workspace,type=bind",
+    "features": {}
 }

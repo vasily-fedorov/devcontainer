@@ -1,0 +1,16 @@
+{
+    "name": "Terraform",
+    "id": "terraform",
+    "version": "1.0.0",
+    "description": "Installs Terraform with Yandex Cloud provider configuration",
+    "documentationURL": "https://www.terraform.io/",
+    "options": {},
+    "installsAfter": [],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "hashicorp.terraform"
+            ]
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Docker in Docker",
+    "id": "dind",
+    "version": "1.0.0",
+    "description": "Installs Docker CLI and enables Docker-in-Docker functionality",
+    "documentationURL": "https://docs.docker.com/",
+    "options": {},
+    "installsAfter": [],
+    "containerEnv": {
+        "DOCKER_HOST": "unix:///var/run/docker.sock"
+    }
+}
