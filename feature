@@ -17,6 +17,122 @@ if [ -z "$FEATURE_ARG" ]; then
     exit 1
 fi
 
+# Function to get GitHub repository from OCI namespace using collection index
+get_github_repo_from_oci() {
+    local oci_namespace="$1"
+    
+    # Download collection index from devcontainers.github.io
+    local collection_index_url="https://raw.githubusercontent.com/devcontainers/devcontainers.github.io/gh-pages/_data/collection-index.yml"
+    local collection_index=$(curl -sL "$collection_index_url" 2>/dev/null)
+    
+    if [ -z "$collection_index" ]; then
+        echo "Error: Failed to download collection index"
+        return 1
+    fi
+    
+    # Extract repository URL for the given OCI namespace
+    local repo_url=$(echo "$collection_index" | awk -v namespace="$oci_namespace" '
+    /ociReference:/ {
+        getline
+        if ($0 ~ namespace) {
+            found = 1
+        }
+    }
+    /repository:/ && found {
+        print $2
+        found = 0
+    }
+    ' | head -1)
+    
+    if [ -n "$repo_url" ]; then
+        echo "$repo_url"
+        return 0
+    fi
+    
+    # If not found in collection index, try common patterns
+    case "$oci_namespace" in
+        "devcontainers/features")
+            echo "https://github.com/devcontainers/features"
+            return 0
+            ;;
+        "devcontainers/templates")
+            echo "https://github.com/devcontainers/templates"
+            return 0
+            ;;
+        *)
+            # Try to extract from namespace pattern (owner/repo)
+            local owner=$(echo "$oci_namespace" | cut -d'/' -f1)
+            local repo_part=$(echo "$oci_namespace" | cut -d'/' -f2-)
+            
+            # Common patterns for feature repositories
+            if echo "$repo_part" | grep -q "features"; then
+                echo "https://github.com/$owner/$repo_part"
+                return 0
+            elif echo "$repo_part" | grep -q "devcontainer-features"; then
+                echo "https://github.com/$owner/$repo_part"
+                return 0
+            else
+                echo "https://github.com/$owner/$repo_part-features"
+                return 0
+            fi
+            ;;
+    esac
+}
+
+# Function to recursively download directory from GitHub
+download_github_directory() {
+    local github_owner="$1"
+    local github_repo="$2"
+    local path="$3"
+    local output_dir="$4"
+    
+    # Get the list of files and directories from GitHub API
+    local github_api_url="https://api.github.com/repos/$github_owner/$github_repo/contents/$path"
+    local contents=$(curl -sL "$github_api_url")
+    
+    if [ -z "$contents" ] || echo "$contents" | grep -q '"message":"Not Found"'; then
+        echo "Warning: Directory not found: $path"
+        return 1
+    fi
+    
+    # Process each item in the directory
+    if command -v jq >/dev/null 2>&1; then
+        local items=$(echo "$contents" | jq -r '.[] | "\(.type) \(.path) \(.name)"' 2>/dev/null)
+    else
+        # Fallback: try to parse JSON without jq
+        local items=$(echo "$contents" | grep -o '"type":"[^"]*","path":"[^"]*","name":"[^"]*"' | \
+                     sed 's/"type":"\([^"]*\)","path":"\([^"]*\)","name":"\([^"]*\)"/\1 \2 \3/g' 2>/dev/null)
+    fi
+    
+    if [ -z "$items" ]; then
+        echo "Warning: Could not parse directory contents: $path"
+        return 1
+    fi
+    
+    echo "$items" | while read -r type item_path item_name; do
+        if [ "$type" = "file" ]; then
+            # Download file
+            local github_raw_url="https://raw.githubusercontent.com/$github_owner/$github_repo/main/$item_path"
+            local output_file="$output_dir/$item_name"
+            
+            echo "Downloading file: $item_path"
+            if curl -sL -f "$github_raw_url" -o "$output_file"; then
+                # Make scripts executable if they have .sh extension
+                if echo "$item_name" | grep -q '\.sh$'; then
+                    chmod +x "$output_file"
+                fi
+            else
+                echo "Warning: Failed to download file: $item_path"
+            fi
+        elif [ "$type" = "dir" ]; then
+            # Recursively download subdirectory
+            local subdir_output="$output_dir/$item_name"
+            mkdir -p "$subdir_output"
+            download_github_directory "$github_owner" "$github_repo" "$item_path" "$subdir_output"
+        fi
+    done
+}
+
 # Function to download OCI feature from GitHub repository
 download_oci_feature() {
     local url="$1"
@@ -45,37 +161,40 @@ download_oci_feature() {
         # Extract feature name from namespace (e.g., "devcontainers/features/python" -> "python")
         local feature_name_only=$(echo "$namespace" | sed 's|.*/||')
         
-        # GitHub raw content URL for the feature
-        local github_raw_url="https://raw.githubusercontent.com/devcontainers/features/main/src/$feature_name_only"
-        
-        echo "Downloading from GitHub: $github_raw_url"
-
-        # Download additional files that might exist in the feature directory
-        # Get the list of files from GitHub API
-        local github_api_url="https://api.github.com/repos/devcontainers/features/contents/src/$feature_name_only"
-        echo "Fetching file list from GitHub API: $github_api_url"
-        
-        local file_list
-        if command -v jq >/dev/null 2>&1; then
-            file_list=$(curl -sL "$github_api_url" | jq -r '.[] | select(.type == "file") | .name' 2>/dev/null)
-        else
-            # Fallback: try to get file list using curl and grep
-            file_list=$(curl -sL "$github_api_url" | grep -o '"name":"[^"]*"' | cut -d'"' -f4 2>/dev/null)
+        # Get GitHub repository URL from OCI namespace
+        local github_repo_url=$(get_github_repo_from_oci "$namespace")
+        if [ -z "$github_repo_url" ]; then
+            echo "Error: Could not determine GitHub repository for OCI namespace: $namespace"
+            rm -rf "$temp_dir"
+            return 1
         fi
         
-        if [ -n "$file_list" ]; then
-            echo "Found files: $file_list"
-            for file in $file_list; do
+        # Extract owner and repo from GitHub URL
+        local github_owner_repo=$(echo "$github_repo_url" | sed 's|https://github.com/||')
+        local github_owner=$(echo "$github_owner_repo" | cut -d'/' -f1)
+        local github_repo=$(echo "$github_owner_repo" | cut -d'/' -f2)
+        
+        echo "Found GitHub repository: $github_owner/$github_repo"
+        
+        # Recursively download the entire feature directory
+        local feature_path="src/$feature_name_only"
+        echo "Downloading feature directory recursively: $feature_path"
+        
+        if ! download_github_directory "$github_owner" "$github_repo" "$feature_path" "$temp_dir"; then
+            echo "Warning: Could not download feature directory recursively, trying individual files"
+            
+            # Fallback: try to download common files individually
+            local common_files="devcontainer-feature.json install.sh library_scripts.sh scenario.sh test.sh NOTES.md README.md"
+            local github_raw_url="https://raw.githubusercontent.com/$github_owner/$github_repo/main/$feature_path"
+            
+            for file in $common_files; do
                 if curl -sL -f "$github_raw_url/$file" -o "$temp_dir/$file"; then
                     echo "Downloaded file: $file"
-                    # Make scripts executable if they have .sh extension
                     if echo "$file" | grep -q '\.sh$'; then
                         chmod +x "$temp_dir/$file"
                     fi
                 fi
             done
-        else
-            echo "Could not fetch file list from GitHub API"
         fi
         
         # Check if we have at least the required files
