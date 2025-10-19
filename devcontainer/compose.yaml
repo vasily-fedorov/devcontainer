@@ -13,7 +13,6 @@ services:
       args:
         USER_ID: $UID
         USER_NAME: $COMPOSE_PROJECT_NAME
-        PYTHON_VERSION: $PYTHON_VERSION
         IMAGE: $IMAGE
         BUILD_SH: build.sh
         PORT: $PORT

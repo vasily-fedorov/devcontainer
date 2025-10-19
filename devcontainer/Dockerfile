@@ -1,7 +1,6 @@
 #!/usr/bin/env -S docker build . --tag=devcontainer --network=host --file
 ARG IMAGE=ubuntu:latest
 FROM $IMAGE AS base
-ARG PYTHON_VERSION=3.12
 ARG USER_ID=${UID}
 ARG USER_NAME=${COMPOSE_PROJECT_NAME}
 ARG BUILD_SH=""

@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+export PYTHON_VERSION=3.12
 export PYENV_ROOT=/home/$USER_NAME/.pyenv
 export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 
