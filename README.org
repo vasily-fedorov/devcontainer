@@ -48,6 +48,11 @@ feature add <path_to_feature>
 ../devcontainer/feature add ../devcontainer/features/python
 #+end_src
 
+Также поддерживается скачивание features из OCI registry (ghcr.io):
+#+begin_src shell
+../devcontainer/feature add ghcr.io/devcontainers/features/python:1
+#+end_src
+
 Доступные в этом репозитории features:
 - python :: Python с pyenv и поддержкой виртуальных окружений
 - terraform :: Terraform с провайдером Yandex Cloud
@@ -58,7 +63,7 @@ feature add <path_to_feature>
 
 ** Удаление features
 #+begin_src shell
-./feature delete <feature_name>
+../devcontainer/feature delete <feature_name>
 #+end_src
 
 ** Данные, кэш и bash_history
@@ -81,6 +86,7 @@ feature add <path_to_feature>
 - Локальные features с установкой через install.sh
 - Автоматическое добавление в devcontainer.json
 - Поддержка compose.yaml для features
+- Скачивание features из OCI registry (ghcr.io)
 
 * Пример использования
 #+begin_src shell
