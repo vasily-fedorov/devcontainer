@@ -72,11 +72,6 @@ feature add <path_to_feature>
 - .devcontainer/data :: данные подключенных сервисов
 - .devcontainer/cache :: ~/.cache
 
-** TODO Подключение сервисов
-Хочется подключать сервисы из шаблонов в services
-Данные окажутся в .devcontainer/data/<service>
-Логи окажутся в .devcontainer/logs/<service>
-
 * Что сделано
 ** Кэширование apt и pip
 При сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.

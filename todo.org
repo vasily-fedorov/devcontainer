@@ -1,6 +1,31 @@
 #+title: Todo
 
 * Задачи
+** TODO Подключение сервисов
+Хочется подключать сервисы из шаблонов в services
+Данные окажутся в .devcontainer/data/<service>
+Логи окажутся в .devcontainer/logs/<service>
+
+** Вставлять feature после уже установленных
+** Использование готовых features из репозитория
+** Как надо чтоб работало:
+#+begin_src
+../devcontainer/init -f python,yandex-cli -s elastic proj
+.devcontainer/up # .devcontainer/activate
+../devcontainer/add service postgresql
+../devcontainer/add feature dind
+../devcontainer/rm service postgresql
+../devcontainer/rm feature dind
+#+end_src
+*** Стандартное
+Хранение .devcontainer/.bashrc
+Данные и логи в .devcontainer/volumes .devcontainer/logs
+Ведение vscode-compatible devcontainer.json
+Обозримый Dockerfile
+Обозримый compose.yaml
+Подключать vscode features
+Стандартные команды запуска и остановки
+Никакого мусора в
 ** .devcontainer/down
 Сделать команду остановки и удаления контейнеров
 ** Подключать vscode features
@@ -20,3 +45,6 @@ shell в Dockerfile не подхватывает из .bashrc - на приме
 чтоб кэширование нормально работало
 ** сделать features вместе с compose
 Чтоб в командах подключались compose-файлы features, тогда работает merge
+** каждый features это:
+- install.sh
+- compose.yaml (merge с общим, например для дополнительных environment)
