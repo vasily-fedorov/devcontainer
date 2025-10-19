@@ -2,11 +2,14 @@
 
 Контейнеризация разработки на стандартных инструментах в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
 
-Получаем:
+* Что умеет
 1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
-2. Запускается одной кнопкой в vscode
-3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore и т.д.
-4. Можно отлаживать создание devcontainer
+2. Не нужны никакие дополнительные пакеты для работы
+3. Запускается одной кнопкой в vscode
+4. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, хранить историю bash и т.д.
+5. Можно отлаживать создание devcontainer
+6. Кэш при сборке, хранение истории bash
+7. Поддержка features
 
 * Использование
 ** Инициализация devcontainer
@@ -32,18 +35,30 @@ cd project
 - .devcontainer/exec :: запуск команды внутри контейнера. Например,  =/devcontainer/exec bash= запускает в shell внутри контейнера.
 - .devcontainer/stop :: останавливает контейнеры (еще [[https://github.com/devcontainers/cli?tab=readme-ov-file][не реализовано]] в cli )
 
-** Подключение сервисов
-В файле .devcontainer/compose есть директивы include. Чтобы включить сервис в проекте нужно раскомментировать соответсвующую строчку.
-#+begin_src
-include/<service>.yaml
-#+end_src
-Данные окажутся в .devcontainer/data/<service>
-Логи окажутся в .devcontainer/logs/<service>
+** Подключение features
+Можно подключать локальные features в devcontainer-совместимом виде.
 
-*** Пример
-#+begin_src yaml
-include:
-  - services/postgresql.yaml
+Для подключения оформленного по стандарту devcontainer feature используется команда feature:
+#+begin_src shell
+feature add <path_to_feature>
+#+end_src
+
+Например, в корне проекта:
+#+begin_src shell
+../devcontainer/feature add ../devcontainer/features/python
+#+end_src
+
+Доступные в этом репозитории features:
+- python :: Python с pyenv и поддержкой виртуальных окружений
+- terraform :: Terraform с провайдером Yandex Cloud
+- yandexcloud-cli :: Yandex Cloud CLI (yc)
+- dind :: Docker-in-Docker
+- litestream :: Litestream для репликации SQLite
+- direnv :: Direnv для управления переменными окружения
+
+** Удаление features
+#+begin_src shell
+./feature delete <feature_name>
 #+end_src
 
 ** Данные, кэш и bash_history
@@ -52,20 +67,57 @@ include:
 - .devcontainer/data :: данные подключенных сервисов
 - .devcontainer/cache :: ~/.cache
 
+** TODO Подключение сервисов
+Хочется подключать сервисы из шаблонов в services
+Данные окажутся в .devcontainer/data/<service>
+Логи окажутся в .devcontainer/logs/<service>
+
 * Что сделано
 ** Кэширование apt и pip
 При сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
 ** Ведение истории bash
 ** Правильные gitignore и dockerignore
+** Поддержка devcontainer features
+- Локальные features с установкой через install.sh
+- Автоматическое добавление в devcontainer.json
+- Поддержка compose.yaml для features
 
 * Пример использования
-#+begin_src
+#+begin_src shell
 git clone https://github.com/django-ve/django-helloworld
 git clone https://github.com/vasily-fedorov/devcontainer
 cd django-helloworld
 ../devcontainer/init helloworld
+../devcontainer/feature add ../devcontainer/features/python
 .devcontainer/activate
 pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8000
 #+end_src
 И идем на http://localhost:8000, видим надпись "Hello world"
+
+* Структура проекта
+#+begin_src
+devcontainer/
+├── features/           # Доступные features
+│   ├── python/
+│   ├── terraform/
+│   ├── yandexcloud-cli/
+│   ├── dind/
+│   ├── litestream/
+│   └── direnv/
+├── services/           # Конфигурации сервисов
+│   ├── postgres.yaml
+│   ├── redis.yaml
+│   ├── rabbitmq.yaml
+│   ├── elasticmq.yaml
+│   ├── mailhog.yaml
+│   └── minio.yaml
+├── devcontainer/       # Шаблоны для инициализации
+│   ├── Dockerfile
+│   ├── compose.yaml
+│   ├── devcontainer.json
+│   └── ...
+├── feature             # Скрипт управления features
+├── init               # Скрипт инициализации проекта
+└── README.org
+#+end_src
