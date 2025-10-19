@@ -31,10 +31,10 @@ get_github_repo_from_oci() {
     fi
     
     # Extract repository URL for the given OCI namespace
-    local repo_url=$(echo "$collection_index" | awk -v namespace="$oci_namespace" '
+    local repo_url=$(echo "$collection_index" | awk -v ns="$oci_namespace" '
     /ociReference:/ {
         getline
-        if ($0 ~ namespace) {
+        if ($0 ~ ns) {
             found = 1
         }
     }
