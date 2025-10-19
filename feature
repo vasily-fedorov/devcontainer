@@ -38,6 +38,19 @@ case $COMMAND in
         echo "Adding feature: $FEATURE_NAME from $FEATURE_ABS_PATH"
         cp -r "$FEATURE_ABS_PATH" ".devcontainer/$FEATURE_NAME"
 
+        # Update devcontainer.json to include feature as local referenced feature using jq
+        echo "Adding feature to devcontainer.json"
+        if [ -f ".devcontainer/devcontainer.json" ]; then
+            if command -v jq >/dev/null 2>&1; then
+                jq --arg feature_name "$FEATURE_NAME" '.features["./\($feature_name)"] = {}' ".devcontainer/devcontainer.json" > ".devcontainer/devcontainer.json.tmp"
+                mv ".devcontainer/devcontainer.json.tmp" ".devcontainer/devcontainer.json"
+            else
+                echo "Warning: jq not found, cannot update devcontainer.json automatically"
+                echo "Please add the following to devcontainer.json features section manually:"
+                echo "    \"./$FEATURE_NAME\": {}"
+            fi
+        fi
+
         # Update Dockerfile to include feature's install.sh
         echo "Adding feature installation to Dockerfile"
         if [ -f ".devcontainer/Dockerfile" ]; then
@@ -99,6 +112,19 @@ EOF
         if [ ! -d ".devcontainer/$FEATURE_PATH" ]; then
             echo "Feature '$FEATURE_PATH' not found in .devcontainer directory"
             exit 1
+        fi
+
+        # Remove feature from devcontainer.json using jq
+        echo "Removing feature from devcontainer.json"
+        if [ -f ".devcontainer/devcontainer.json" ]; then
+            if command -v jq >/dev/null 2>&1; then
+                jq --arg feature_name "$FEATURE_PATH" 'del(.features["./\($feature_name)"])' ".devcontainer/devcontainer.json" > ".devcontainer/devcontainer.json.tmp"
+                mv ".devcontainer/devcontainer.json.tmp" ".devcontainer/devcontainer.json"
+            else
+                echo "Warning: jq not found, cannot update devcontainer.json automatically"
+                echo "Please remove the following from devcontainer.json features section manually:"
+                echo "    \"./$FEATURE_PATH\": {}"
+            fi
         fi
 
         # Remove feature from devcontainer
