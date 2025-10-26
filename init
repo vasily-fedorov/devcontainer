@@ -1,7 +1,82 @@
 #!/usr/bin/env sh
+
+# Function to display help
+show_help() {
+    cat << EOF
+Usage: $0 [OPTIONS] PROJECT_NAME
+
+Initialize a devcontainer project with the specified name.
+
+OPTIONS:
+    --port=PORT      Set the port number (default: 8642)
+    --image=IMAGE    Set the base Docker image (default: ubuntu:latest)
+    --uid=UID        Set the user ID (default: current user's UID)
+    --help           Show this help message
+
+EXAMPLES:
+    $0 myproject
+    $0 --port=8080 --image=node:18 myproject
+    $0 --uid=1001 --image=python:3.11 myproject
+EOF
+}
+
+# Check for help flag first
+for arg in "$@"; do
+    case $arg in
+        --help|-h)
+            show_help
+            exit 0
+            ;;
+    esac
+done
+
 echo "The script you are running has:"
 echo "basename: [$(basename "$0")]"
 echo "dirname : [$(dirname "$0")]"
 echo "pwd     : [$(pwd)]"
+
+# Set default values
+PORT=8642
+IMAGE=ubuntu:latest
+UID=$(id -u)
+
+# Parse command line arguments
+while [ $# -gt 0 ]; do
+    case $1 in
+        --port=*)
+            PORT="${1#*=}"
+            shift
+            ;;
+        --image=*)
+            IMAGE="${1#*=}"
+            shift
+            ;;
+        --uid=*)
+            UID="${1#*=}"
+            shift
+            ;;
+        --help|-h)
+            show_help
+            exit 0
+            ;;
+        *)
+            # Assume this is the project name (first positional argument)
+            PROJECT_NAME="$1"
+            shift
+            ;;
+    esac
+done
+
+# Check if PROJECT_NAME is set
+if [ -z "$PROJECT_NAME" ]; then
+    echo "Error: PROJECT_NAME is required"
+    echo ""
+    show_help
+    exit 1
+fi
+
 cp -r --remove-destination $(dirname "$0")/devcontainer $(pwd)/.devcontainer
-echo COMPOSE_PROJECT_NAME=$1 >> $(pwd)/.devcontainer/.env
+echo "COMPOSE_PROJECT_NAME=$PROJECT_NAME" >> $(pwd)/.devcontainer/.env
+echo "PORT=$PORT" >> $(pwd)/.devcontainer/.env
+echo "IMAGE=$IMAGE" >> $(pwd)/.devcontainer/.env
+echo "UID=$UID" >> $(pwd)/.devcontainer/.env

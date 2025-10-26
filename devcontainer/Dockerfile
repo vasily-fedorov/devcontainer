@@ -17,7 +17,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update && apt -y install --no-install-recommends --no-install-suggests \
     adduser sudo curl bash less ca-certificates ssh-client
 
-RUN adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME sudo
+# If UID is 1000, rename the existing user instead of creating a new one
+RUN if [ "$USER_ID" = "1000" ]; then \
+        existing_user=$(getent passwd 1000 | cut -d: -f1); \
+        if [ -n "$existing_user" ] && [ "$existing_user" != "$USER_NAME" ]; then \
+            usermod -l $USER_NAME $existing_user && \
+            usermod -d /home/$USER_NAME -m $USER_NAME && \
+            groupmod -n $USER_NAME $existing_user; \
+        fi; \
+    else \
+        adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME sudo; \
+    fi
+
 RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER_NAME
 
 USER $USER_NAME
