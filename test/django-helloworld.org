@@ -1,0 +1,17 @@
+#+title: Django Helloworld Test Specification
+
+#+begin_src
+cd ~/projects
+git clone https://github.com/vasily-fedorov/django-helloworld
+cd django-helloworld 
+../devcontainer/init hello
+../devcontainer/feature/add ../devcontainer/features/python
+#+end_src
+
+В контейнере:
+#+begin_src 
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8642
+curl -s http://localhost:8642 | grep -q "Hello, world!" && echo "Ok" || echo "Fail"
+#+end_src
