@@ -10,6 +10,7 @@
 5. Можно отлаживать создание devcontainer
 6. Кэш при сборке, хранение истории bash
 7. Поддержка features
+8. self-contained repository: для работы и запуска не нужны репозитории features 
 
 * Использование
 ** Инициализация devcontainer

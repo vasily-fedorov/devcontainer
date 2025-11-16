@@ -2,10 +2,10 @@
 ARG IMAGE=ubuntu:latest
 FROM $IMAGE AS base
 ARG USER_ID=${UID}
-ARG USER_NAME=${COMPOSE_PROJECT_NAME}
+ARG USERNAME=${COMPOSE_PROJECT_NAME}
 ARG BUILD_SH=""
 ARG PORT=5678
-ENV USER_NAME=${USER_NAME}
+ENV USERNAME=${USERNAME}
 ENV DEBIAN_FRONTEND=noninteractive
 # for .bashrc
 ENV PROMPT_COMMAND='history -a'
@@ -20,22 +20,22 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # If UID is 1000, rename the existing user instead of creating a new one
 RUN if [ "$USER_ID" = "1000" ]; then \
         existing_user=$(getent passwd 1000 | cut -d: -f1); \
-        if [ -n "$existing_user" ] && [ "$existing_user" != "$USER_NAME" ]; then \
-            usermod -l $USER_NAME $existing_user && \
-            usermod -d /home/$USER_NAME -m $USER_NAME && \
-            groupmod -n $USER_NAME $existing_user; \
+        if [ -n "$existing_user" ] && [ "$existing_user" != "$USERNAME" ]; then \
+            usermod -l $USERNAME $existing_user && \
+            usermod -d /home/$USERNAME -m $USERNAME && \
+            groupmod -n $USERNAME $existing_user; \
         fi; \
     else \
-        adduser --disabled-password --uid $USER_ID $USER_NAME && adduser $USER_NAME sudo; \
+        adduser --disabled-password --uid $USER_ID $USERNAME && adduser $USERNAME sudo; \
     fi
 
-RUN echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER_NAME
+RUN echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USERNAME
 
-USER $USER_NAME
+USER $USERNAME
 COPY --chown=$USER_ID .devcontainer /workspace/.devcontainer
-
+USER root
 # features begin: run install.sh for every feature
 # features end
-
+USER $USERNAME
 WORKDIR /workspace
 CMD sh /workspace/.devcontainer/cmd.sh && sleep infinity
