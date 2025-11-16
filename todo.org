@@ -1,50 +1,116 @@
 #+title: Todo
 
 * Задачи
-** TODO Подключение сервисов
+** TODO [#A] Проверить совместимость с vscode
+** TODO [#A] написать тесты
+dood
+django-helloworld
+devcontainer/cli
+features из devcontainer/features
+** TODO [#B] Добавить инструкцию в README по запуску со сторонним feature
+** TODO [#B] положить features согласно стандарту devcontainer
+и положить внутрь devcontainer-feature.json
+#+begin_src txt
+.
+├── src/
+│   ├── hello/
+│   │   ├── devcontainer-feature.json
+│   │   └── install.sh
+│   ├── color/
+│   │   ├── devcontainer-feature.json
+│   │   └── install.sh
+│   └── another-feature/
+│       ├── devcontainer-feature.json
+│       └── install.sh
+├── .devcontainer/ (Optional, for local testing/development of features)
+│   ├── devcontainer.json
+│   └── ...
+#+end_src
+** [#B] поправить stop
+указывать там compose аналогично up
+** [#C] Подключение сервисов
 Хочется подключать сервисы из шаблонов в services
 Данные окажутся в .devcontainer/data/<service>
 Логи окажутся в .devcontainer/logs/<service>
-
-** Вставлять feature после уже установленных
-** Использование готовых features из репозитория
-** Как надо чтоб работало:
-#+begin_src
-../devcontainer/init -f python,yandex-cli -s elastic proj
-.devcontainer/up # .devcontainer/activate
-../devcontainer/add service postgresql
-../devcontainer/add feature dind
-../devcontainer/rm service postgresql
-../devcontainer/rm feature dind
-#+end_src
-*** Стандартное
-Хранение .devcontainer/.bashrc
-Данные и логи в .devcontainer/volumes .devcontainer/logs
-Ведение vscode-compatible devcontainer.json
-Обозримый Dockerfile
-Обозримый compose.yaml
-Подключать vscode features
-Стандартные команды запуска и остановки
-Никакого мусора в
-** .devcontainer/down
-Сделать команду остановки и удаления контейнеров
-** Подключать vscode features
-https://github.com/devcontainers/features
-** Разобраться с пользователями и rootless запуском
-В wsl2 UID=1002, в обычном Linux UID=1000 . Надо ли создавать пользователя, или запускать от рута в контейнере? И если от рута - как мапить правки обратно с правильными правами?
-https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
-** Улучшить подключение features
-Подключать конкретные features
-Добавлять в проект
-** Команду убирания ненужного (неиспользуемого)
-** Переменные окружения
-shell в Dockerfile не подхватывает из .bashrc - на примере pyenv
-** ssh-client добавил
-** DONE dind добавить
-** DONE копировать только features, а не весь .devcontainer
-чтоб кэширование нормально работало
-** сделать features вместе с compose
+** Archive :ARCHIVE:
+*** DONE сделать features вместе с compose
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
 Чтоб в командах подключались compose-файлы features, тогда работает merge
-** каждый features это:
+*** DONE Починить feature python чтоб работали тесты
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+видимо сейчас от пользователя, надо sudo
+*** DONE [#A] поправить подключение features - убрать ghcr
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** CANCEL [#C] Переменные окружения
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+shell в Dockerfile не подхватывает из .bashrc - на примере pyenv
+*** DONE [#C] поправить pyenv подключение
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** DONE [#B] Проверить совместимость с devcontainres/cli
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** DONE проверить подключение сторонних features 
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+**** Подключать vscode features
+https://github.com/devcontainers/features
+*** DONE проверить docker in docker
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** DONE Сделать подключение compose.yaml в features
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+feature это:
 - install.sh
 - compose.yaml (merge с общим, например для дополнительных environment)
+*** DONE Вставлять feature после уже установленных
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** DONE Команду убирания ненужного (неиспользуемого)
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+*** DONE Использование готовых features из репозитория
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:28
+:END:
+Из каталога
+*** DONE .devcontainer/down
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:29
+:END:
+Сделать команду остановки и удаления контейнеров
+*** DONE Разобраться с пользователями и rootless запуском
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:29
+:END:
+В wsl2 UID=1002, в обычном Linux UID=1000 . Надо ли создавать пользователя, или запускать от рута в контейнере? И если от рута - как мапить правки обратно с правильными правами?
+https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
+*** DONE ssh-client добавил
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:29
+:END:
+*** DONE dind добавить
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:29
+:END:
+*** DONE копировать только features, а не весь .devcontainer
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-11-17 Mon 02:29
+:END:
+чтоб кэширование нормально работало

@@ -58,7 +58,7 @@ feature add <path_to_feature>
 - python :: Python с pyenv и поддержкой виртуальных окружений
 - terraform :: Terraform с провайдером Yandex Cloud
 - yandexcloud-cli :: Yandex Cloud CLI (yc)
-- dind :: Docker-in-Docker
+- dood :: Docker-out-of-Docker
 - litestream :: Litestream для репликации SQLite
 - direnv :: Direnv для управления переменными окружения
 

@@ -1,3 +1,5 @@
 .devcontainer/data
 .devcontainer/cache
 .devcontainer/bash_history
+.git
+.vscode
