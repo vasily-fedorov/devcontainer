@@ -1,9 +1,0 @@
-{
-    "name": "Litestream",
-    "id": "litestream",
-    "version": "1.0.0",
-    "description": "Installs Litestream for SQLite streaming replication",
-    "documentationURL": "https://litestream.io/",
-    "options": {},
-    "installsAfter": []
-}

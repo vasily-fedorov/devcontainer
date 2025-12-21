@@ -1,9 +1,0 @@
-{
-    "name": "Yandex Cloud CLI",
-    "id": "yandexcloud-cli",
-    "version": "1.0.0",
-    "description": "Installs Yandex Cloud CLI (yc) for managing Yandex Cloud resources",
-    "documentationURL": "https://cloud.yandex.com/en/docs/cli/",
-    "options": {},
-    "installsAfter": []
-}
