@@ -62,7 +62,7 @@ case $COMMAND in
                 print "RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \\"
                 print "    --mount=type=cache,target=/var/lib/apt,sharing=locked \\"
                 print "    --mount=type=cache,target=/root/.cache,sharing=locked \\"
-                print "    --mount=type=cache,target=/home/$USER_NAME/.cache,sharing=locked \\"
+                print "    --mount=type=cache,target=/home/$USERNAME/.cache,sharing=locked \\"
                 print "    if [ -f /workspace/.devcontainer/" feature "/install.sh ]; then bash /workspace/.devcontainer/" feature "/install.sh; fi"
                 print $0
                 next
