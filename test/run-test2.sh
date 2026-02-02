@@ -52,7 +52,6 @@ cd "$TEST_DIR/django-helloworld/"
 echo "Running test commands in container..."
 docker exec testdjango bash -ic "
     cd /workspace
-    pyenv activate workspace
     pip install -r requirements.txt
     python manage.py migrate
     python manage.py runserver 0.0.0.0:8643 &
