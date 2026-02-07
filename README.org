@@ -28,14 +28,6 @@ cd project
 И попадаем в =bash= внутри контейнера.
 Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в =/workspace=.
 
-** Доступные команды
-Доступные после инициализации команды повторяют devcontainer/cli .
-- .devcontainer/up :: сборка и запуск контейнеров
-- .devcontainer/build :: сборка контейнеров
-- .devcontainer/activate :: сборка, запуск и логин в bash внутри основного контейнера
-- .devcontainer/exec :: запуск команды внутри контейнера. Например,  =/devcontainer/exec bash= запускает в shell внутри контейнера.
-- .devcontainer/stop :: останавливает контейнеры (еще [[https://github.com/devcontainers/cli?tab=readme-ov-file][не реализовано]] в cli )
-
 ** Подключение features
 Можно подключать локальные features в devcontainer-совместимом виде.
 
@@ -49,18 +41,14 @@ feature add <path_to_feature>
 ../devcontainer/feature add ../devcontainer/features/python
 #+end_src
 
-Также поддерживается скачивание features из OCI registry (ghcr.io):
-#+begin_src shell
-../devcontainer/feature add ghcr.io/devcontainers/features/python:1
-#+end_src
-
-Доступные в этом репозитории features:
-- python :: Python с pyenv и поддержкой виртуальных окружений
-- terraform :: Terraform с провайдером Yandex Cloud
-- yandexcloud-cli :: Yandex Cloud CLI (yc)
-- dood :: Docker-out-of-Docker
-- litestream :: Litestream для репликации SQLite
-- direnv :: Direnv для управления переменными окружения
+** Доступные команды
+Доступные после инициализации команды повторяют devcontainer/cli .
+- .devcontainer/up :: сборка и запуск контейнеров
+- .devcontainer/build :: сборка контейнеров
+- .devcontainer/activate :: сборка, запуск и логин в bash внутри основного контейнера
+- .devcontainer/exec :: запуск команды внутри контейнера. Например,  =/devcontainer/exec bash= запускает в shell внутри контейнера.
+- .devcontainer/stop :: останавливает контейнеры
+- .devcontainer/down :: останавливает контейнеры
 
 ** Удаление features
 #+begin_src shell
@@ -80,39 +68,48 @@ feature add <path_to_feature>
 ** Правильные gitignore и dockerignore
 ** Поддержка devcontainer features
 - Локальные features с установкой через install.sh
-- Автоматическое добавление в devcontainer.json
 - Поддержка compose.yaml для features
-- Скачивание features из OCI registry (ghcr.io)
 
 * Пример использования
 #+begin_src shell
 git clone https://github.com/django-ve/django-helloworld
 git clone https://github.com/vasily-fedorov/devcontainer
+git clone https://github.com/devcontainers/features.git
 cd django-helloworld
-../devcontainer/init helloworld
-../devcontainer/feature add ../devcontainer/features/python
+../devcontainer/init --port=8643 helloworld
+../devcontainer/feature add ../features/src/python
 .devcontainer/activate
 pip install -r requirements.txt
-python manage.py runserver 0.0.0.0:8000
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8643
+curl http://localhost:8643
 #+end_src
-И идем на http://localhost:8000, видим надпись "Hello world"
+
+* Тестирование
+Для запуска всех тестов:
+#+begin_src bash
+make test
+#+end_src
 
 * Структура проекта
 #+begin_src
 devcontainer/
-├── services/           # Конфигурации сервисов
-│   ├── postgres.yaml
-│   ├── redis.yaml
-│   ├── rabbitmq.yaml
-│   ├── elasticmq.yaml
-│   ├── mailhog.yaml
-│   └── minio.yaml
-├── devcontainer/       # Шаблоны для инициализации
+├── devcontainer/       # Шаблоны для инициализации стороннего проекта
 │   ├── Dockerfile
 │   ├── compose.yaml
 │   ├── devcontainer.json
+│   ├── up
+│   ├── stop
+│   ├── down
+│   ├── activate
+│   ├── exec
 │   └── ...
 ├── feature             # Скрипт управления features
 ├── init               # Скрипт инициализации проекта
+├── test/              # Тесты
+│   ├── feature-python.sh
+│   ├── devcontainer-features-python.sh
+│   └── devcontainers-cli-compat.sh
+├── Makefile           # Управление тестированием
 └── README.org
 #+end_src

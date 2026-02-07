@@ -2,14 +2,7 @@
 
 * Задачи
 ** TODO [#A] Проверить совместимость с vscode
-** DONE [#A] написать тесты
-*** DONE Тест на подключение feature из репозитория devcontainers/features
-*** DONE Тест на подключение feature собственной разработки (на примере django-helloworld)
-*** DONE Тест на запуск контейнера с devcontainer/cli
-
 ** TODO [#B] Добавить инструкцию в README по запуску со сторонним feature
-** TODO [#B] поправить stop
-указывать там compose аналогично up
 ** [#C] Подключение сервисов
 Хочется подключать сервисы из шаблонов
 Данные окажутся в .devcontainer/data/<service>

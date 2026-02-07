@@ -16,6 +16,45 @@ if [ -z "$FEATURE_ARG" ]; then
     exit 1
 fi
 
+# Function to update compose scripts (up, stop, down)
+update_compose_scripts() {
+    local script_name=$1
+    local script_path=".devcontainer/$script_name"
+    
+    # Create a backup of the original script
+    cp "$script_path" "$script_path.backup"
+    
+    # Create the new script with main compose.yaml
+    cat > "$script_path" << 'EOF'
+#!/usr/bin/env sh
+docker compose -f ./.devcontainer/compose.yaml \
+EOF
+    
+    # Add all feature compose.yaml files
+    for feature_dir in .devcontainer/*/; do
+        if [ -f "${feature_dir}compose.yaml" ]; then
+            feature_name=$(basename "$feature_dir")
+            echo "    -f ./.devcontainer/${feature_name}/compose.yaml \\" >> "$script_path"
+        fi
+    done
+    
+    # Add the rest of the script based on script name
+    case $script_name in
+        up)
+            echo "    up -d --build --remove-orphans" >> "$script_path"
+            ;;
+        stop)
+            echo "    stop" >> "$script_path"
+            ;;
+        down)
+            echo "    down" >> "$script_path"
+            ;;
+    esac
+    
+    # Remove the backup
+    rm "$script_path.backup"
+}
+
 case $COMMAND in
     add)
         # Local path case only
@@ -61,33 +100,12 @@ case $COMMAND in
             rm ".devcontainer/Dockerfile.backup"
         fi
 
-        # Update up script to include feature's compose.yaml if it exists
+        # Update compose scripts if feature has compose.yaml
         if [ -f ".devcontainer/$FEATURE_NAME/compose.yaml" ]; then
-            echo "Adding feature compose.yaml to up script"
-            # Create a backup of the original up script
-            cp ".devcontainer/up" ".devcontainer/up.backup"
-            
-            # Create a new up script that includes the feature's compose.yaml
-            cat > ".devcontainer/up" << 'EOF'
-#!/usr/bin/env sh
-docker compose -f ./.devcontainer/compose.yaml \
-EOF
-            
-            # Add all feature compose.yaml files
-            for feature_dir in .devcontainer/*/; do
-                if [ -f "${feature_dir}compose.yaml" ]; then
-                    feature_name=$(basename "$feature_dir")
-                    echo "    -f ./.devcontainer/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
-                fi
-            done
-            
-            # Add the rest of the original up script
-            cat >> ".devcontainer/up" << 'EOF'
-    up -d --build --remove-orphans
-EOF
-            
-            # Remove the backup
-            rm ".devcontainer/up.backup"
+            echo "Adding feature compose.yaml to compose scripts"
+            update_compose_scripts "up"
+            update_compose_scripts "stop"
+            update_compose_scripts "down"
         fi
 
         echo "Feature '$FEATURE_NAME' added successfully"
@@ -153,36 +171,11 @@ EOF
             rm -f ".devcontainer/Dockerfile.tmp"
         fi
 
-        # Update up script to remove feature's compose.yaml if it exists
-        if [ -f ".devcontainer/up" ]; then
-            echo "Removing feature compose.yaml from up script"
-            # Create a backup of the original up script
-            cp ".devcontainer/up" ".devcontainer/up.backup"
-            
-            # Create a new up script without the removed feature's compose.yaml
-            cat > ".devcontainer/up" << 'EOF'
-#!/usr/bin/env sh
-docker compose -f ./.devcontainer/compose.yaml \
-EOF
-            
-            # Add all remaining feature compose.yaml files
-            for feature_dir in .devcontainer/*/; do
-                if [ -f "${feature_dir}compose.yaml" ]; then
-                    feature_name=$(basename "$feature_dir")
-                    if [ "$feature_name" != "$FEATURE_ARG" ]; then
-                        echo "    -f ./.devcontainer/${feature_name}/compose.yaml \\" >> ".devcontainer/up"
-                    fi
-                fi
-            done
-            
-            # Add the rest of the original up script
-            cat >> ".devcontainer/up" << 'EOF'
-    up -d --build --remove-orphans
-EOF
-            
-            # Remove the backup
-            rm ".devcontainer/up.backup"
-        fi
+        # Update compose scripts to remove feature's compose.yaml if it exists
+        echo "Updating compose scripts after feature removal"
+        update_compose_scripts "up"
+        update_compose_scripts "stop"
+        update_compose_scripts "down"
 
         echo "Feature '$FEATURE_ARG' removed successfully"
         ;;
