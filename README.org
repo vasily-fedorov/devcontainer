@@ -1,16 +1,15 @@
 #+title: Readme
 
-Контейнеризация разработки на стандартных инструментах в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
+Контейнеризация разработки на bash и docker в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
 
 * Что умеет
 1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
 2. Не нужны никакие дополнительные пакеты для работы
-3. Запускается одной кнопкой в vscode
-4. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, как хранить историю bash и т.д.
-5. Можно отлаживать создание devcontainer
-6. Кэш при сборке, хранение истории bash
-7. Поддержка features
-8. self-contained repository: для работы и запуска не нужны репозитории features 
+3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, как хранить историю bash и т.д.
+4. Можно отлаживать создание devcontainer
+5. Кэш при сборке, хранение истории bash
+6. Поддержка features
+7. self-contained repository: для работы и запуска не нужны репозитории features 
 
 * Использование
 ** Инициализация devcontainer
@@ -72,18 +71,24 @@ feature add <path_to_feature>
 
 * Пример использования
 #+begin_src shell
-git clone https://github.com/django-ve/django-helloworld
-git clone https://github.com/vasily-fedorov/devcontainer
-git clone https://github.com/devcontainers/features.git
-cd django-helloworld
-../devcontainer/init --port=8643 helloworld
-../devcontainer/feature add ../features/src/python
-.devcontainer/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8643
-curl http://localhost:8643
+$ git clone https://github.com/django-ve/django-helloworld
+$ git clone https://github.com/vasily-fedorov/devcontainer
+$ git clone https://github.com/devcontainers/features.git
+$ cd django-helloworld
+$ ../devcontainer/init --port=8643 helloworld
+$ ../devcontainer/feature add ../features/src/python
+$ .devcontainer/activate
+helloworld@:/workspace$ pip install -r requirements.txt
+helloworld@:/workspace$ python manage.py migrate
+helloworld@:/workspace$ python manage.py runserver 0.0.0.0:8643 &
+helloworld@:/workspace$ curl http://localhost:8643
+Hello, world!
+Ctrl-D
+$ curl http://localhost:8643
+Hello, world!
 #+end_src
+То есть можем работать в окружении внутри контейнера, а можем редактировать код в привычном редакторе снаружи и смотреть внутрь контейнера через указанный порт.
+
 
 * Тестирование
 Для запуска всех тестов:
