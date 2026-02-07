@@ -100,13 +100,6 @@ python manage.py runserver 0.0.0.0:8000
 * Структура проекта
 #+begin_src
 devcontainer/
-├── features/           # Доступные features
-│   ├── python/
-│   ├── terraform/
-│   ├── yandexcloud-cli/
-│   ├── dind/
-│   ├── litestream/
-│   └── direnv/
 ├── services/           # Конфигурации сервисов
 │   ├── postgres.yaml
 │   ├── redis.yaml
