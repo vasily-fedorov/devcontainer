@@ -4,12 +4,11 @@
 
 * Что умеет
 1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
-2. Не нужны никакие дополнительные пакеты для работы
+2. Не нужны никакие дополнительные пакеты для работы, не потребуются сторонние зависимости для запуска проекта
 3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, как хранить историю bash и т.д.
 4. Можно отлаживать создание devcontainer
 5. Кэш при сборке, хранение истории bash
 6. Поддержка features
-7. self-contained repository: для работы и запуска не нужны репозитории features 
 
 * Использование
 ** Инициализация devcontainer
@@ -27,8 +26,17 @@ cd project
 И попадаем в =bash= внутри контейнера.
 Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в =/workspace=.
 
+** Доступные команды
+Доступные после инициализации команды повторяют [[https://github.com/devcontainers/cli][devcontainers/cli]] .
+- =.devcontainer/up= : сборка и запуск контейнеров
+- =.devcontainer/build= : сборка контейнеров
+- =.devcontainer/activate= : сборка, запуск и логин в bash внутри основного контейнера
+- =.devcontainer/exec= : запуск команды внутри контейнера. Например,  =.devcontainer/exec bash= запускает в shell внутри контейнера.
+- =.devcontainer/stop= : останавливает контейнер
+- =.devcontainer/down= : удаляет контейнер
+
 ** Подключение features
-Можно подключать локальные features в devcontainer-совместимом виде.
+Можно подключать features в devcontainer-совместимом виде. Для этого репозиторий с feature нужно скачать локально.
 
 Для подключения оформленного по стандарту devcontainer feature используется команда feature:
 #+begin_src shell
@@ -37,17 +45,9 @@ feature add <path_to_feature>
 
 Например, в корне проекта:
 #+begin_src shell
-../devcontainer/feature add ../devcontainer/features/python
+git clone https://github.com/devcontainers/features.git ~/tmp/features
+../devcontainer/feature add ~/tmp/features/src/python
 #+end_src
-
-** Доступные команды
-Доступные после инициализации команды повторяют devcontainer/cli .
-- .devcontainer/up :: сборка и запуск контейнеров
-- .devcontainer/build :: сборка контейнеров
-- .devcontainer/activate :: сборка, запуск и логин в bash внутри основного контейнера
-- .devcontainer/exec :: запуск команды внутри контейнера. Например,  =/devcontainer/exec bash= запускает в shell внутри контейнера.
-- .devcontainer/stop :: останавливает контейнеры
-- .devcontainer/down :: останавливает контейнеры
 
 ** Удаление features
 #+begin_src shell
@@ -60,16 +60,15 @@ feature add <path_to_feature>
 - .devcontainer/data :: данные подключенных сервисов
 - .devcontainer/cache :: ~/.cache
 
-* Что сделано
-** Кэширование apt и pip
-При сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
-** Ведение истории bash
-** Правильные gitignore и dockerignore
-** Поддержка devcontainer features
-- Локальные features с установкой через install.sh
-- Поддержка compose.yaml для features
+* Особенности
+- Проект это набор bash, Dockerfile, compose.  
+- Кэш в Dockerfile: при сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
+- История bash хранится в проекте (локально)
+- Правильные gitignore и dockerignore
+- Поддержка devcontainer features и compose.yaml для features - для переопределения переменных
 
 * Пример использования
+Запускаем проект hello world, используя стандартное python feature 
 #+begin_src shell
 $ git clone https://github.com/django-ve/django-helloworld
 $ git clone https://github.com/vasily-fedorov/devcontainer
@@ -87,8 +86,8 @@ Ctrl-D
 $ curl http://localhost:8643
 Hello, world!
 #+end_src
-То есть можем работать в окружении внутри контейнера, а можем редактировать код в привычном редакторе снаружи и смотреть внутрь контейнера через указанный порт.
-
+Можем работать в окружении внутри контейнера, а можем редактировать код в привычном редакторе снаружи.
+Можем отлаживать внутри контейнера, можем смотреть внутрь контейнера через указанный порт.
 
 * Тестирование
 Для запуска всех тестов:
