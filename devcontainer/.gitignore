@@ -1,7 +1,6 @@
 /terraform.tfstate
 /.terraform/
 /.terraform.lock.hcl
-/.env
 /data
 /logs
 /cache

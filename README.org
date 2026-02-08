@@ -1,4 +1,4 @@
-#+title: Readme
+#+title: Devcontainer
 
 Контейнеризация разработки на bash и docker в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
 
@@ -6,9 +6,8 @@
 1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
 2. Не нужны никакие дополнительные пакеты для работы, не потребуются сторонние зависимости для запуска проекта
 3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, как хранить историю bash и т.д.
-4. Можно отлаживать создание devcontainer
-5. Кэш при сборке, хранение истории bash
-6. Поддержка features
+4. Кэш при сборке, хранение истории bash
+5. Поддержка features
 
 * Использование
 ** Инициализация devcontainer
@@ -117,3 +116,8 @@ devcontainer/
 ├── Makefile           # Управление тестированием
 └── README.org
 #+end_src
+
+* Ссылки
+- https://containers.dev/ - описание стандарта devcontainers.
+- https://github.com/devcontainers/cli - reference implementation для cli. При этом cli не умеет даже останавливать и удалять контейнеры.
+- https://github.com/johannes-mueller/devcontainer.el - пытаются соблюсти спецификацию devcontainer внутри emacs

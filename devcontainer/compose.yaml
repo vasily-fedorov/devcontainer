@@ -6,7 +6,8 @@ services:
     volumes:
       - ../:/workspace
       - ./bash_history:/home/$COMPOSE_PROJECT_NAME/.bash_history
-      - ./cache:/home/$COMPOSE_PROJECT_NAME/.cache
+      - ./cache/user-cache:/home/$COMPOSE_PROJECT_NAME/.cache
+      - ./cache/apt-archives:/var/cache/apt/archives
     build:
       context: ../
       dockerfile: ./.devcontainer/Dockerfile
@@ -14,7 +15,6 @@ services:
         USER_ID: $UID
         USERNAME: $COMPOSE_PROJECT_NAME
         IMAGE: $IMAGE
-        BUILD_SH: build.sh
         PORT: $PORT
     stdin_open: true
     tty: true
