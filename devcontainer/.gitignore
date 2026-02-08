@@ -1,7 +1,3 @@
-/terraform.tfstate
-/.terraform/
-/.terraform.lock.hcl
 /data
 /logs
-/cache
 /bash_history
