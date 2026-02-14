@@ -148,7 +148,7 @@ git clone https://github.com/devcontainers/features.git ~/tmp/features
 | =.devcontainer/compose.yaml=   | Конфигурация Docker Compose                                                |
 | =.devcontainer/devcontainer.json= | Конфигурация для совместимости с devcontainer CLI                          |
 
-**Важно:** Эти директории добавлены в =.gitignore= и =.dockerignore= автоматически.
+*Важно:* Эти директории добавлены в =.gitignore= и =.dockerignore= автоматически.
 
 * Особенности
 - *Простота*: Проект это набор bash-скриптов, Dockerfile и compose.yaml - без магии
