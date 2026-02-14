@@ -81,7 +81,7 @@ cd project
 | =.devcontainer/stop=     | Останавливает контейнер                                                  |
 | =.devcontainer/down=     | Удаляет контейнер                                                        |
 
-**Примеры использования команд:**
+*Примеры использования команд:*
 #+begin_src shell
 # Запустить контейнер
 .devcontainer/up
@@ -109,7 +109,7 @@ cd project
 ../devcontainer/feature add <path_to_feature>
 #+end_src
 
-**Пример подключения Python feature:**
+*Пример подключения Python feature:*
 #+begin_src shell
 # Клонируем официальные features
 git clone https://github.com/devcontainers/features.git ~/tmp/features
@@ -118,7 +118,7 @@ git clone https://github.com/devcontainers/features.git ~/tmp/features
 ../devcontainer/feature add ~/tmp/features/src/python
 #+end_src
 
-**Доступные features:**
+*Доступные features:*
 - [[https://github.com/devcontainers/features/tree/main/src/python][Python]] - Python с pip и инструментами разработки
 - [[https://github.com/devcontainers/features/tree/main/src/node][Node.js]] - Node.js с npm/yarn
 - [[https://github.com/devcontainers/features/tree/main/src/go][Go]] - Go с инструментами разработки
@@ -131,7 +131,7 @@ git clone https://github.com/devcontainers/features.git ~/tmp/features
 ../devcontainer/feature delete <feature_name>
 #+end_src
 
-**Пример удаления feature:**
+*Пример удаления feature:*
 #+begin_src shell
 ../devcontainer/feature delete python
 #+end_src
@@ -151,13 +151,13 @@ git clone https://github.com/devcontainers/features.git ~/tmp/features
 **Важно:** Эти директории добавлены в =.gitignore= и =.dockerignore= автоматически.
 
 * Особенности
-- **Простота**: Проект это набор bash-скриптов, Dockerfile и compose.yaml - без магии
-- **Кэширование**: При сборке Dockerfile необходимые пакеты скачиваются один раз, последующие сборки проходят быстрее
-- **История команд**: История bash хранится локально в проекте и сохраняется между перезапусками
-- **Автоматическое игнорирование**: Правильные =.gitignore= и =.dockerignore= создаются автоматически
-- **Поддержка features**: Совместимость с devcontainer features и compose.yaml для переопределения переменных
-- **Кроссплатформенность**: Работает на Linux, macOS и WSL2
-- **CI/CD готовность**: Можно использовать в CI/CD пайплайнах без изменений
+- *Простота*: Проект это набор bash-скриптов, Dockerfile и compose.yaml - без магии
+- *Кэширование*: При сборке Dockerfile необходимые пакеты скачиваются один раз, последующие сборки проходят быстрее
+- *История команд*: История bash хранится локально в проекте и сохраняется между перезапусками
+- *Автоматическое игнорирование*: Правильные =.gitignore= и =.dockerignore= создаются автоматически
+- *Поддержка features*: Совместимость с devcontainer features и compose.yaml для переопределения переменных
+- *Кроссплатформенность*: Работает на Linux, macOS и WSL2
+- *CI/CD готовность*: Можно использовать в CI/CD пайплайнах без изменений
 
 * Пример использования
 ** Пример 1: Django проект с Python feature
