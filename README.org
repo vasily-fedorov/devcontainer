@@ -2,12 +2,49 @@
 
 Контейнеризация разработки на bash и docker в vscode [[https://containers.dev/][devcontainer]]-совместимом виде.
 
+* Оглавление
+- [[#быстрый-старт][Быстрый старт]]
+- [[#что-умеет][Что умеет]]
+- [[#требования][Требования]]
+- [[#использование][Использование]]
+  - [[#инициализация-devcontainer][Инициализация devcontainer]]
+  - [[#использование-devcontainer][Использование devcontainer]]
+  - [[#доступные-команды][Доступные команды]]
+  - [[#подключение-features][Подключение features]]
+  - [[#удаление-features][Удаление features]]
+- [[#данные-кэш-и-bash_history][Данные, кэш и bash_history]]
+- [[#особенности][Особенности]]
+- [[#пример-использования][Пример использования]]
+- [[#тестирование][Тестирование]]
+- [[#структура-проекта][Структура проекта]]
+- [[#ссылки][Ссылки]]
+
+* Быстрый старт
+#+begin_src shell
+# Клонируем devcontainer
+git clone https://github.com/vasily-fedorov/devcontainer
+
+# Переходим в ваш проект
+cd /path/to/your/project
+
+# Инициализируем devcontainer для проекта
+../devcontainer/init myproject
+
+# Активируем devcontainer
+.devcontainer/activate
+#+end_src
+
 * Что умеет
 1. Работа на стандартных инструментах - bash, Docker, Docker Compose, без магии. Можно использовать без vscode и в ci/cd.
 2. Не нужны никакие дополнительные пакеты для работы, не потребуются сторонние зависимости для запуска проекта
 3. Быстрая контейнеризация любого проекта и любой активности: не надо вспоминать мелкие настройки, править gitignore, dockerignore, как хранить историю bash и т.д.
 4. Кэш при сборке, хранение истории bash
 5. Поддержка features
+
+* Требования
+- [[https://www.docker.com/][Docker]] и [[https://docs.docker.com/compose/][Docker Compose]]
+- Bash shell
+- Git (для клонирования репозитория)
 
 * Использование
 ** Инициализация devcontainer
@@ -17,76 +54,171 @@ cd project
 ../devcontainer/init <project_name>
 #+end_src
 
+Создается .devcontainer, в котором лежит:
+- .env : файл с настройками проекта - название, порт, UID, базовый образ
+- devcontainer.json : для совместимости с cli
+- compose.yaml : файл, задающий параметры devcontainer
+и т.д.
+
 ** Использование devcontainer
 В корне проекта:
 #+begin_src shell
 .devcontainer/activate
 #+end_src
+
 И попадаем в =bash= внутри контейнера.
 Редактировать исходный код можно снаружи контейнера, можно внутри. Внутри контейнера он расположен в =/workspace=.
 
 ** Доступные команды
 Доступные после инициализации команды повторяют [[https://github.com/devcontainers/cli][devcontainers/cli]] .
-- =.devcontainer/up= : сборка и запуск контейнеров
-- =.devcontainer/build= : сборка контейнеров
-- =.devcontainer/activate= : сборка, запуск и логин в bash внутри основного контейнера
-- =.devcontainer/exec= : запуск команды внутри контейнера. Например,  =.devcontainer/exec bash= запускает в shell внутри контейнера.
-- =.devcontainer/stop= : останавливает контейнер
-- =.devcontainer/down= : удаляет контейнер
+
+| Команда                  | Описание                                                                 |
+|--------------------------|--------------------------------------------------------------------------|
+| =.devcontainer/up=       | Сборка и запуск контейнеров                                              |
+| =.devcontainer/build=    | Сборка контейнеров                                                       |
+| =.devcontainer/activate= | Сборка, запуск и логин в bash внутри основного контейнера                |
+| =.devcontainer/exec=     | Запуск команды внутри контейнера (например, =.devcontainer/exec bash=)   |
+| =.devcontainer/stop=     | Останавливает контейнер                                                  |
+| =.devcontainer/down=     | Удаляет контейнер                                                        |
+
+**Примеры использования команд:**
+#+begin_src shell
+# Запустить контейнер
+.devcontainer/up
+
+# Собрать контейнер без запуска
+.devcontainer/build
+
+# Запустить команду внутри контейнера
+.devcontainer/exec python --version
+.devcontainer/exec npm install
+.devcontainer/exec make test
+
+# Остановить контейнер
+.devcontainer/stop
+
+# Полностью удалить контейнер
+.devcontainer/down
+#+end_src
 
 ** Подключение features
 Можно подключать features в devcontainer-совместимом виде. Для этого репозиторий с feature нужно скачать локально.
 
 Для подключения оформленного по стандарту devcontainer feature используется команда feature:
 #+begin_src shell
-feature add <path_to_feature>
+../devcontainer/feature add <path_to_feature>
 #+end_src
 
-Например, в корне проекта:
+**Пример подключения Python feature:**
 #+begin_src shell
+# Клонируем официальные features
 git clone https://github.com/devcontainers/features.git ~/tmp/features
+
+# Подключаем Python feature
 ../devcontainer/feature add ~/tmp/features/src/python
 #+end_src
+
+**Доступные features:**
+- [[https://github.com/devcontainers/features/tree/main/src/python][Python]] - Python с pip и инструментами разработки
+- [[https://github.com/devcontainers/features/tree/main/src/node][Node.js]] - Node.js с npm/yarn
+- [[https://github.com/devcontainers/features/tree/main/src/go][Go]] - Go с инструментами разработки
+- [[https://github.com/devcontainers/features/tree/main/src/rust][Rust]] - Rust с Cargo
+- [[https://github.com/devcontainers/features/tree/main/src/java][Java]] - Java с Maven/Gradle
+- И многие другие в [[https://github.com/devcontainers/features][официальном репозитории]]
 
 ** Удаление features
 #+begin_src shell
 ../devcontainer/feature delete <feature_name>
 #+end_src
 
-** Данные, кэш и bash_history
-Все данные по умолчанию внутри ./.devcontainer
-- .devcontainer/bash_history :: история bash внутри контейнера
-- .devcontainer/data :: данные подключенных сервисов
-- .devcontainer/cache :: ~/.cache
+**Пример удаления feature:**
+#+begin_src shell
+../devcontainer/feature delete python
+#+end_src
+
+* Данные, кэш и bash_history
+Все данные по умолчанию хранятся внутри =./.devcontainer=
+
+| Директория/Файл                | Назначение                                                                 |
+|--------------------------------|----------------------------------------------------------------------------|
+| =.devcontainer/bash_history=   | История команд bash внутри контейнера                                      |
+| =.devcontainer/data=           | Данные подключенных сервисов (базы данных, кэш и т.д.)                     |
+| =.devcontainer/cache=          | Кэш системы (~/.cache)                                                     |
+| =.devcontainer/.env=           | Настройки проекта (порт, UID, базовый образ)                               |
+| =.devcontainer/compose.yaml=   | Конфигурация Docker Compose                                                |
+| =.devcontainer/devcontainer.json= | Конфигурация для совместимости с devcontainer CLI                          |
+
+**Важно:** Эти директории добавлены в =.gitignore= и =.dockerignore= автоматически.
 
 * Особенности
-- Проект это набор bash, Dockerfile, compose.  
-- Кэш в Dockerfile: при сборке необходимые пакеты скачиваются один раз, в следующий раз сборка пройдет быстрее.
-- История bash хранится в проекте (локально)
-- Правильные gitignore и dockerignore
-- Поддержка devcontainer features и compose.yaml для features - для переопределения переменных
+- **Простота**: Проект это набор bash-скриптов, Dockerfile и compose.yaml - без магии
+- **Кэширование**: При сборке Dockerfile необходимые пакеты скачиваются один раз, последующие сборки проходят быстрее
+- **История команд**: История bash хранится локально в проекте и сохраняется между перезапусками
+- **Автоматическое игнорирование**: Правильные =.gitignore= и =.dockerignore= создаются автоматически
+- **Поддержка features**: Совместимость с devcontainer features и compose.yaml для переопределения переменных
+- **Кроссплатформенность**: Работает на Linux, macOS и WSL2
+- **CI/CD готовность**: Можно использовать в CI/CD пайплайнах без изменений
 
 * Пример использования
-Запускаем проект hello world, используя стандартное python feature 
+** Пример 1: Django проект с Python feature
+Запускаем проект hello world, используя стандартное python feature:
 #+begin_src shell
-$ git clone https://github.com/django-ve/django-helloworld
-$ git clone https://github.com/vasily-fedorov/devcontainer
-$ git clone https://github.com/devcontainers/features.git
-$ cd django-helloworld
-$ ../devcontainer/init --port=8643 helloworld
-$ ../devcontainer/feature add ../features/src/python
-$ .devcontainer/activate
+# Клонируем необходимые репозитории
+git clone https://github.com/django-ve/django-helloworld
+git clone https://github.com/vasily-fedorov/devcontainer
+git clone https://github.com/devcontainers/features.git
+
+# Переходим в проект
+cd django-helloworld
+
+# Инициализируем devcontainer с портом 8643
+../devcontainer/init --port=8643 helloworld
+
+# Добавляем Python feature
+../devcontainer/feature add ../features/src/python
+
+# Активируем devcontainer
+.devcontainer/activate
+
+# Внутри контейнера устанавливаем зависимости и запускаем сервер
 helloworld@:/workspace$ pip install -r requirements.txt
 helloworld@:/workspace$ python manage.py migrate
 helloworld@:/workspace$ python manage.py runserver 0.0.0.0:8643 &
+
+# Проверяем работу
 helloworld@:/workspace$ curl http://localhost:8643
 Hello, world!
-Ctrl-D
+
+# Выходим из контейнера (Ctrl-D)
+helloworld@:/workspace$ exit
+
+# Проверяем снаружи контейнера
 $ curl http://localhost:8643
 Hello, world!
 #+end_src
-Можем работать в окружении внутри контейнера, а можем редактировать код в привычном редакторе снаружи.
-Можем отлаживать внутри контейнера, можем смотреть внутрь контейнера через указанный порт.
+
+** Пример 2: Node.js проект
+#+begin_src shell
+# Инициализируем новый проект
+mkdir my-node-project && cd my-node-project
+../devcontainer/init --port=3000 node-app
+
+# Добавляем Node.js feature
+../devcontainer/feature add ../features/src/node
+
+# Активируем и работаем внутри
+.devcontainer/activate
+node-app@:/workspace$ npm init -y
+node-app@:/workspace$ npm install express
+node-app@:/workspace$ # создаем app.js и т.д.
+#+end_src
+
+** Преимущества такого подхода:
+- Работаем в изолированном окружении внутри контейнера
+- Редактируем код в привычном редакторе снаружи
+- Отлаживаем внутри контейнера
+- Доступ к сервисам через указанные порты
+- Все зависимости изолированы и воспроизводимы
 
 * Тестирование
 Для запуска всех тестов:
@@ -94,30 +226,61 @@ Hello, world!
 make test
 #+end_src
 
+** Доступные тесты
+#+begin_src bash
+# Запустить все тесты
+make test
+
+# Запустить тесты совместимости с devcontainers CLI
+make test-cli
+
+# Запустить тесты features
+make test-features
+
+# Запустить тесты Python feature
+make test-python
+#+end_src
+
 * Структура проекта
 #+begin_src
 devcontainer/
-├── devcontainer/       # Шаблоны для инициализации стороннего проекта
-│   ├── Dockerfile
-│   ├── compose.yaml
-│   ├── devcontainer.json
-│   ├── up
-│   ├── stop
-│   ├── down
-│   ├── activate
-│   ├── exec
+├── devcontainer/           # Шаблоны для инициализации стороннего проекта
+│   ├── Dockerfile         # Базовый Dockerfile
+│   ├── compose.yaml       # Конфигурация Docker Compose
+│   ├── devcontainer.json  # Конфигурация для devcontainer CLI
+│   ├── up                 # Скрипт запуска контейнеров
+│   ├── stop               # Скрипт остановки контейнеров
+│   ├── down               # Скрипт удаления контейнеров
+│   ├── activate           # Скрипт активации окружения
+│   ├── exec               # Скрипт выполнения команд в контейнере
+│   ├── build              # Скрипт сборки контейнеров
 │   └── ...
-├── feature             # Скрипт управления features
-├── init               # Скрипт инициализации проекта
-├── test/              # Тесты
+├── feature                # Скрипт управления features
+├── init                  # Скрипт инициализации проекта
+├── test/                 # Тесты
 │   ├── feature-python.sh
 │   ├── devcontainer-features-python.sh
 │   └── devcontainers-cli-compat.sh
-├── Makefile           # Управление тестированием
-└── README.org
+├── Makefile              # Управление тестированием
+└── README.org           # Эта документация
 #+end_src
 
+* Часто задаваемые вопросы (FAQ)
+** Q: Чем этот проект отличается от официального devcontainers/cli?
+A: Этот проект предоставляет более полный набор команд (включая stop, down), работает на чистом bash и Docker Compose, и не требует установки дополнительных зависимостей.
+
+** Q: Можно ли использовать без VS Code?
+A: Да, полностью. Проект работает на любом терминале с Docker и Docker Compose.
+
+** Q: Как перенести существующий devcontainer в этот формат?
+A: Скопируйте ваши Dockerfile, docker-compose.yml и devcontainer.json в соответствующие файлы в .devcontainer/ и используйте команды этого проекта.
+
+** Q: Поддерживаются ли пользовательские Docker образы?
+A: Да, вы можете указать любой базовый образ в .devcontainer/.env файле.
+
 * Ссылки
-- https://containers.dev/ - описание стандарта devcontainers.
-- https://github.com/devcontainers/cli - reference implementation для cli. При этом cli не умеет даже останавливать и удалять контейнеры.
-- https://github.com/johannes-mueller/devcontainer.el - пытаются соблюсти спецификацию devcontainer внутри emacs
+- [[https://containers.dev/][containers.dev]] - официальная спецификация devcontainers
+- [[https://github.com/devcontainers/cli][devcontainers/cli]] - reference implementation для CLI (ограниченная функциональность)
+- [[https://github.com/devcontainers/features][devcontainers/features]] - официальный репозиторий features
+- [[https://github.com/johannes-mueller/devcontainer.el][devcontainer.el]] - реализация devcontainer для Emacs
+- [[https://docs.docker.com/compose/][Docker Compose документация]]

@@ -37,4 +37,4 @@ USER root
 # features end
 USER $USERNAME
 WORKDIR /workspace
-CMD sh /workspace/.devcontainer/cmd.sh && sleep infinity
+CMD ["sh", "-c", "sh /workspace/.devcontainer/cmd.sh && sleep infinity"]
